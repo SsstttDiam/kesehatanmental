@@ -1,32 +1,35 @@
-from flask import Flask, request, render_template
-import joblib
+import streamlit as st
 import numpy as np
-
-app = Flask(__name__)
+import joblib
 
 # Load model dan scaler
 model = joblib.load("mentalhealth_model.pkl")
 scaler = joblib.load("scaler.pkl")
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        try:
-            stress = float(request.form["StressLevel"])
-            sleep = float(request.form["SleepQuality"])
-            academic = float(request.form["AcademicPressure"])
-            social = float(request.form["SocialSupport"])
-            phone = float(request.form["PhoneUsageHours"])
+st.title("Prediksi Risiko Depresi Mahasiswa")
 
-            features = np.array([[stress, sleep, academic, social, phone]])
-            features_scaled = scaler.transform(features)
-            prediction = model.predict(features_scaled)[0]
+# Form input
+with st.form("mental_health_form"):
+    st.header("Masukkan data mahasiswa:")
+    
+    stress = st.slider("Tingkat Stres (1 = rendah, 5 = tinggi)", 1, 5, 3)
+    sleep = st.slider("Kualitas Tidur (1 = buruk, 5 = sangat baik)", 1, 5, 3)
+    academic = st.slider("Tekanan Akademik (1 = ringan, 5 = berat)", 1, 5, 3)
+    social = st.slider("Dukungan Sosial (1 = sangat rendah, 5 = sangat tinggi)", 1, 5, 3)
+    phone = st.number_input("Durasi Penggunaan HP per Hari (jam)", min_value=0.0, max_value=24.0, value=5.0, step=0.1)
 
-            result = "Berpotensi mengalami depresi" if prediction == 1 else "Tidak berpotensi mengalami depresi"
-            return render_template("index.html", result=result)
-        except:
-            return render_template("index.html", result="Masukan tidak valid.")
-    return render_template("index.html", result=None)
+    submitted = st.form_submit_button("Prediksi")
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if submitted:
+    # Persiapan data
+    features = np.array([[stress, sleep, academic, social, phone]])
+    features_scaled = scaler.transform(features)
+    
+    # Prediksi
+    prediction = model.predict(features_scaled)[0]
+    
+    st.header("Hasil Prediksi")
+    if prediction == 1:
+        st.error("⚠️ Berpotensi mengalami depresi")
+    else:
+        st.success("✅ Tidak berpotensi mengalami depresi")
