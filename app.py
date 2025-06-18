@@ -2,13 +2,9 @@ import streamlit as st
 import numpy as np
 import joblib
 
-# Load model dan scaler
-try:
-    model = joblib.load("mentalhealth_model.pkl")
-    scaler = joblib.load("scaler.pkl")
-except:
-    st.error("❌ Model atau scaler tidak ditemukan. Pastikan 'mentalhealth_model.pkl' dan 'scaler.pkl' ada di direktori yang sama.")
-    st.stop()
+# Load model dan scaler (tanpa try-except)
+model = joblib.load("mentalhealth_model.pkl")
+scaler = joblib.load("scaler.pkl")
 
 # Konfigurasi halaman
 st.set_page_config(page_title="Prediksi Depresi Mahasiswa", layout="centered")
@@ -17,10 +13,11 @@ st.markdown(
     """
     Aplikasi ini digunakan untuk memprediksi apakah seorang mahasiswa **berpotensi mengalami depresi**
     berdasarkan lima indikator utama:
-    - Tingkat stres
-    - Kualitas tidur
-    - Tekanan akademik
-    - Dukungan sosial
+    
+    - Tingkat stres  
+    - Kualitas tidur  
+    - Tekanan akademik  
+    - Dukungan sosial  
     - Durasi penggunaan HP per hari
     """
 )
@@ -39,7 +36,7 @@ with st.form("mental_health_form"):
 
 # Proses prediksi jika tombol ditekan
 if submitted:
-    # Konversi dan normalisasi input
+    # Format input dan normalisasi
     input_data = np.array([[stress, sleep, academic, social, phone]])
     input_scaled = scaler.transform(input_data)
 
@@ -53,7 +50,7 @@ if submitted:
     else:
         st.success("✅ Mahasiswa **tidak berpotensi mengalami depresi**. Tetap jaga kesehatan mental!")
 
-    # Tampilkan data input untuk referensi
+    # Tampilkan data input
     st.markdown("### 🔎 Data yang Dimasukkan:")
     st.json({
         "Tingkat Stres": stress,
