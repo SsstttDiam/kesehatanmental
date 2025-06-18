@@ -1,6 +1,5 @@
 import streamlit as st
 import numpy as np
-import pandas as pd
 import joblib
 
 # Muat model dan scaler
@@ -8,13 +7,6 @@ model = joblib.load('mental_health_model.pkl')
 scaler = joblib.load('mental_health_scaler.pkl')
 
 st.title("Prediksi Risiko Depresi pada Mahasiswa")
-
-# Tampilkan cuplikan dataset
-st.subheader("Contoh Dataset")
-df = pd.read_csv("mentalhealth_dataset.csv", sep=';')
-df = df[["Gender", "Age", "CGPA", "SleepQuality", "StudyStressLevel",
-         "StudyHoursPerWeek", "AcademicEngagement", "HasMentalHealthSupport", "Depression"]]
-st.dataframe(df.head(10))
 
 # Form input
 with st.form("Form_depresi"):
